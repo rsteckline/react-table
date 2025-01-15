@@ -5,52 +5,70 @@ import { COLUMNS } from './columns'
 import './table.css'
 
 export const BasicTable = () => {
-
     const columns = useMemo(() => COLUMNS, [])
     const data = useMemo(() => MOCK_DATA, [])
 
-    const tableInstance = useTable({
+
+
+    const {
+        /* these are basically functions and arrays that the useTable hooks has given us to enable easy table creation. we need to use all of these w HTML for react table to work as intended. */
+
+        getTableProps, /* fxn needed to destructure the table tag*/
+        getTableBodyProps, /* fxn needed to destructure the tbody tags */
+        headerGroups, /* contains column heading info that belongs inside the thead tag of table. it's an array that requires map method to render the jsx for each header group, similar to how you would render list in any other components*/
+        footerGroups,
+        rows,
+        prepareRow,
+    } = useTable({
         columns: columns, /* can be simplified to just 'columns' due to es6 shorthand syntax */
         data: data,
 
     })
 
-    const {
-        /* these are basically functions and arrays that the useTable hooks has given us to enable easy table creation. we need to use all of these w HTML for react table to work as intended. */
-        getTableProps, /* fxn needed to destructure the table tag*/
-        getTableBodyProps, /* fxn needed to destructure the tbody tags */
-        headerGroups, /* contains column heading info that belongs inside the thead tag of table. it's an array that requires map method to render the jsx for each header group, similar to how you would render list in any other components*/
-        rows,
-        prepareRow,
-    } = tableInstance
-
     return (
         <table {...getTableProps()}>
-            <thead>
+            <thead> { /* table header */ }
                 {
                     headerGroups.map(headerGroup => (
-                        <tr {...headerGroup.getHeaderGroupProps()}>
+                        <tr {...headerGroup.getHeaderGroupProps()}> { /* tr tag to specify row  */ }
                             {
                                 headerGroup.headers.map(column => (
-                                    <th {...column.getHeaderProps()}>{column.render('Header')}</th>
+                                    <th {...column.getHeaderProps()}>{column.render('Header')}</th> /* in the header, the data is wrapped with the th tag */
                                 ))}
                         </tr>
                     ))}
             </thead>
-            <tbody  {...getTableBodyProps()}>
+            <tbody  {...getTableBodyProps()}> { /* table body */ }
                 {
                     rows.map((row) => {
                         prepareRow(row)
                         return (
-                            <tr {...row.getRowProps()}>
+                            <tr {...row.getRowProps()}> { /* tr tag to specify row  */ }
                                 {row.cells.map((cell) => {
-                                    return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                                    return <td {...cell.getCellProps()}>{cell.render('Cell')}</td> /* in the body, the data is wrapped with the td tag  */
                                 })}
                             </tr>
                         )
                     })
                 }
             </tbody>
+            <tfoot>
+                {
+                    footerGroups.map(footerGroup => (
+                        <tr {...footerGroup.getFooterGroupProps()}>
+                            {
+                                footerGroup.headers.map(column => (
+                                    <td {...column.getFooterProps}>
+                                        {
+                                            column.render('Footer')
+                                        }
+                                    </td>
+                                ))
+                            }
+                        </tr>
+                    ))
+                }
+            </tfoot>
         </table>
     )
 }
